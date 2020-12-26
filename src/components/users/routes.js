@@ -6,7 +6,7 @@ const express = require('express');
 
 const UserController = require('./controller');
 
-const { reqValidate } = _include('libraries/controllers');
+const { reqValidate } = _include('libraries/validations');
 
 const userCntrl = new UserController();
 
