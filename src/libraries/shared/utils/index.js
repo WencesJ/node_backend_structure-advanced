@@ -1,2 +1,4 @@
-exports.ApiFeatures = require('./ApiFeatures');
-exports.Email = require('./Email');
+module.exports = {
+    ApiFeatures: require('./ApiFeatures'),
+    Email: require('./Email')
+}

@@ -1,3 +1,5 @@
+const { Email } = _include('libraries/shared/utils');
+
 /**
  *
  * @description subScribes for user Feature

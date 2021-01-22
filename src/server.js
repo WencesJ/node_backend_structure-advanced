@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './src/libraries/config/config.env' });
 
-const { database, env} = _include('libraries/config');
+const { config: { database, env } } = _include('libraries/config');
 
 // end of requiring core  and 3rd party modules
 
@@ -40,7 +40,8 @@ process.on('uncaughtException', (err) => {
 
 const PORT = env.PORT;
 
-const DATABASE = (process.env.NODE_ENV === 'development') ? database.LOCAL : config.DB;
+// const DATABASE = (process.env.NODE_ENV === 'development') ? database.LOCAL : config.DB;
+const DATABASE = database.LOCAL 
 
 mongoose
   .connect(DATABASE, {

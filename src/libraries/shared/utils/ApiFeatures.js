@@ -1,10 +1,17 @@
 class ApiFeatures {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
-  }
+  // constructor(query, queryString) {
+  //   this.query = query;
+  //   this.queryString = queryString;
+  // }
 
   // page, sort, limit, filter
+
+  api(Model, queryString) {
+    this.query = Model.find();
+    this.queryString = queryString;
+    
+    return this;
+  }
 
   filter() {
     if (Object.entries(this.queryString).length !== 0) {

@@ -1,5 +1,8 @@
 // all configs are exported here
 
-module.exports = require('./config');
+module.exports =  {
+    config: require('./config'),
+    passportAuth: require('./passport')
+}
 
 

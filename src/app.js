@@ -6,18 +6,20 @@ const helmet = require('helmet');
 const hpp = require('hpp');
 const xss = require('xss-clean');
 const cookieParser = require('cookie-parser');
-const passport = require('passport');
 const cors = require('cors');
 const expressSession = require('express-session');
+
 
 // user custom modules
 const { AppError, errorController: globalErrorHandler } = _include('libraries/error');
 
-const { Router: userRouter } = _include('components/users');
+const { Router: userRouter, User } = _include('components/users');
 
 const { Router: adminRouter } = _include('components/admin');
 
 const { rateLimiter, sessionParams } = _include('libraries/shared/helpers');
+
+// const { passportAuth } = _include('libraries/config');
 
 const app = express();
 
@@ -34,15 +36,19 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   app.use(logger('tiny'));
 }
-// EXPRESS SESSION FOR PASSPORT
-const sessionOptions = expressSession(sessionParams);
 
-app.use(sessionOptions);
+// PASSPORT STRATEGY
+// passportAuth(passport, undefined, User);
+
+// EXPRESS SESSION FOR PASSPORT
+// const sessionOptions = expressSession(sessionParams);
+
+app.use(expressSession(sessionParams(expressSession)));
 
 // PASSPORT INIT
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // BODY-PARSER, READING DATA = body INTO req.body
 app.use(express.json({ limit: '10kb' }));
@@ -78,24 +84,19 @@ app.use(cors());
 
 // IMPLEMENTING RATE LIMITING
 // TODO: Make Function Flexible by implementing parameter injection for rate limit expiration time
-const limitUser = rateLimiter(50);
+// const limitUser = rateLimiter(50);
 
 // ROUTES
 
 // setting the rate limiters
 
-app.use('/', limitUser);
+// app.use('/', limitUser);
 
 // app.use('/view', viewRoutes);
 
 // Would be moved to a seperate module
 
 // Homepage
-
-/* Grabs data = JSON dictionary */
-if (process.env.NODE_ENV === 'test') {
-  app.use('/api/v1/test', testRouter);
-}
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -107,12 +108,11 @@ app.get('/maintainance', (req, res) => {
 });
 
 app.get('/api/v1', (req, res) => {
-  res.status(200).send('<h1>Welcome to Sacrecords Api</h1>');
+  res.status(200).send('<h1>Welcome to DCI Api</h1>');
 });
 
 app.use('/api/v1/users', userRouter);
-
-// app.use('/api/v1/admins', adminRouter);
+app.use('/api/v1/admin', adminRouter);
 
 app.all('*', (req, res, next) => {
   return next(new AppError(`Wrong url '${req.originalUrl}'. This url doesn't exist!`, 404));

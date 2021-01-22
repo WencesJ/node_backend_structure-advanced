@@ -14,7 +14,7 @@ const validate = {
 
 exports.reqValidate = (endpoint) => {
     return (req, res, next) => {
-
+        
         let request = {};
 
         if (!validate[endpoint]) {
@@ -24,8 +24,8 @@ exports.reqValidate = (endpoint) => {
         const request_methods = {
             GET: req.params,
             POST: req.body,
-            PATCH: {...req.params, ...req.body},
-            DELETE: req.params
+            PATCH: req.body,
+            DELETE: req.body
         }
         
         const requestData = request_methods[req.method];
@@ -39,11 +39,24 @@ exports.reqValidate = (endpoint) => {
         const { value, error } = schema.validate({ ...request });
         
         if (error) {
-            return next(new AppError(error, 400));
+            let msg = error.message;
+
+            if (msg.includes('ref')) {
+                msg = "'Password' and 'Confirm Password' Do Not Match. Please Check Passwords!"
+            }
+
+            msg = msg.replace(/"/g, "'");
+
+            return next(new AppError(msg, 400));
         }
         
-        req.body = selectProps(value, Object.keys(req.body));
-        req.params = selectProps(value, Object.keys(req.params));
+        if (req.method === 'GET') {
+            req.params = selectProps(value, Object.keys(req.params));
+        }
+        else {
+            req.body = selectProps(value, Object.keys(req.body));
+        }
+
         next();
     }
 }

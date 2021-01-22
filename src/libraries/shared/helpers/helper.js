@@ -1,5 +1,11 @@
+const mongoose = require('mongoose');
+const mongoConnect = require('connect-mongo');
+
+
+
+
 const rateLimit = require('express-rate-limit');
-const { session } = _include('libraries/config');
+const { config: { session, env } } = _include('libraries/config');
 
 exports.rateLimiter = max =>
     rateLimit({
@@ -28,8 +34,35 @@ exports.fieldplugout = (obj, props) => {
   return obj;
 };
 
-exports.sessionParams = {
-  secret: session.SECRET,
-  resave: false,
-  saveUninitialized: false,
+exports.sessionParams = (expressSession) => {
+
+  const MongoStore = mongoConnect(expressSession);
+  const mongoStoreInstance = new MongoStore({ 
+    mongooseConnection: mongoose.connection, 
+    secret: session.STORE_SECRET,
+    ttl: parseInt(session.STORE_TTL)
+  })
+
+  // mongoStoreInstance.on('destroy', (sessionId) => {
+  //   console.log('destroying session', sessionId);
+  // });
+  // mongoStoreInstance.on('touch', (sessionId) => {
+  //   console.log('touching session', sessionId);
+  // });
+  
+  return {
+    secret: session.SECRET,
+    name: session.NAME,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      // secure: (env.NODE_ENV === env.PROD) ? true : false,
+      maxAge: parseInt(session.COOKIE_MAX_AGE), // Time in milliseconds
+    },
+    saveUninitialized: false,
+    
+    resave: false,
+    store: mongoStoreInstance,
+    unset: 'destroy'
+  }
 };

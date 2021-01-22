@@ -3,9 +3,9 @@
  *
  */
 
-exports.states = (state) => {
-  const statesBucket = [
+exports.states = [
     'abia',
+    'abuja',
     'adamawa',
     'akwa Ibom',
     'anambra',
@@ -13,7 +13,7 @@ exports.states = (state) => {
     'bayelsa',
     'benue',
     'borno',
-    'cross River',
+    'cross river',
     'delta',
     'ebonyi',
     'edo',
@@ -41,11 +41,7 @@ exports.states = (state) => {
     'taraba',
     'yobe',
     'zamfara',
-    'fCT',
-  ];
-
-  return statesBucket.includes(state.toLowerCase());
-};
+];
 
 /**
  * @param lgas = List of Local Goverment Areas

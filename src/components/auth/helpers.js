@@ -8,10 +8,10 @@ const signToken = (id, username) => {
   });
 };
 
-module.exports = (user, statusCode, res) => {
-  const token = signToken(user._id, user.username);
+exports.signToken = ({ id, username }) => {
+  const token = signToken(id, username);
 
-  const cookieOPtions = {
+  const cookieOptions = {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
 
     httpOnly: true,
@@ -21,11 +21,11 @@ module.exports = (user, statusCode, res) => {
     cookieOPtions.secure = true;
   }
 
-  res.cookie('jwt', token, cookieOPtions);
+  // res.cookie('jwt', token, cookieOptions);
 
-  res.status(statusCode).json({
-    status: MSG.SUCCESS,
-    username: user.username,
-    token,
-  });
+  return {
+    name: 'jwt',
+    value: token,
+    cookieOptions
+  };
 };

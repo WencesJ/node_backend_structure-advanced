@@ -3,11 +3,11 @@ const pug = require('pug');
 // const htmlToText = require('html_to_text');
 
 class Email {
-  constructor(user, url) {
-    this.to = user.to;
-    this.firstName = user.firstName;
+  constructor(user, keyMessage) {
     this.from = `EduSchool <${process.env.EMAIL_FROM}>`;
-    this.url = url;
+    this.to = user.email;
+    this.firstName = user.firstName;
+    this.keyMessage = keyMessage;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -36,7 +36,7 @@ class Email {
     if (!template) {
       const html = pug.renderFile(`${__dirname}/../view/email/${template}.pug`, {
         firstName: this.firstName,
-        url: this.url,
+        keyMessage: this.keyMessage,
         subject,
       });
     }
@@ -55,7 +55,7 @@ class Email {
 
   async sendWelcome() {}
 
-  async sendPasswordReset() {
+  async sendPasswordResetToken() {
     await this.send('', 'YOUR PASSWORD RESET TOKEN (EXPIRES IN 10 MINUTES)');
   }
 }

@@ -1,157 +1,112 @@
 // importing the modules
 
-const mongoose = require('mongoose');
-
-// import mongoSanitize from 'express-mongo-sanitize';
+const { Schema, model:Model } = require('mongoose');
 
 const slugify = require('slugify');
 
-// import validator from 'validator';
+const { isEmail } = require('validator');
+
+const bcrypt = require('bcrypt');
 
 const { default: ShortUniqueId } = require('short-unique-id');
 
-const { states, OriginAudit } = require('../../libraries/shared/helpers');
+const { states, OriginAudit } = _include('libraries/shared/helpers');
 
-const { states: lgas } = require('../../libraries/shared/json');
+// const { states: lgas } = _include('libraries/shared/json');
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
-    christainName: {
-      type: String,
-      required: [true, 'Participant Must Have A christainName'],
-      trim: true,
-      lowercase: true,
-      // set: (el) => el.toLowerCase(),
-    },
-
     firstName: {
       type: String,
-
-      required: [true, 'Participant Must Have A Firstname'],
+      required: [true, 'User Must Have A First Name!'],
       trim: true,
       lowercase: true,
-      // set: (el) => el.toLowerCase(),
     },
 
     middleName: {
       type: String,
       trim: true,
-      lowercase: true,
-      // set: (el) => el.toLowerCase(),
+      lowercase: true
     },
 
     lastName: {
       type: String,
-      required: [true, 'Participant Must Have A Lastname'],
-      // set: (el) => el.toLowerCase(),
-    },
-    DOB: {
-      type: Date,
-      required: [true, 'All Participants Must HAve A Date Of Birth'],
-    },
-    POB: {
-      type: String,
+      required: [true, 'User Must Have A Last Name!'],
+      trim: true,
       lowercase: true,
-      required: [true, 'Place Of Birth Cannot Be Empty'],
     },
-    ordained: {
-      type: Boolean,
-      default: false,
-    },
-    parentsOrGuardian: {
-      type: [
-        {
-          type: mongoose.Schema.ObjectId,
-          ref: 'User',
-          cast: '{VALUE} is not a valid id',
-        },
-      ],
 
+    email: {
+      type: String,
+      required: true,
+      validate: [isEmail, 'User Must Have A alid Email Address!'],
+      unique: [true, 'Email Address already exists!'],
+      lowercase: true
+    },
+
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      // select: false
+    },
+
+    passwordConfirm: {
+      type: String,
+      required: true,
+      trim: true,
       validate: {
-        validator: (el) => {
-          return el.length <= 2;
+        validator: function(value) {
+          return this.password === value
         },
-
-        message: 'Max Number Of Parents is Two (2)',
-      },
+        message: 'Passwords Do Not Match. Try Again!'
+      }
     },
 
-    baptism: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Baptism',
-      unique: true,
-    },
-    communion: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Communion',
-      unique: true,
-    },
-    confirmation: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Confirmation',
-      unique: true,
-    },
-    marriage: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Marriage',
-    },
-    death: {
-      type: mongoose.Schema.ObjectId,
-      // ref: 'Death',
+    dob: {
+      type: Date,
+      required: [true, 'User Must Have A Date Of Birth.'],
     },
 
     stateOfOrigin: {
       type: String,
-
-      set: (el) => el.toLowerCase(),
-
-      required: [true, 'Every Participant Must Have A State Of Origin'],
-
-      validate: {
-        validator() {
-          return states(this.stateOfOrigin);
-        },
-
-        message: 'Invalid State , Select A State In Nigeria',
+      required: [true, 'Every User Must Have A State Of Origin.'],
+      enum: {
+        values: states,
+        message: 'Invalid State, Select A State In Nigeria.',
       },
+      lowercase: true
     },
-    lga: {
+
+    stateOfResidence: {
       type: String,
-      lowercase: true,
-      required: [true, 'Every Participant Must HAve A Local Goverment Area'],
-      validate: {
-        validator(lga) {
-          const state = this.stateOfOrigin;
-
-          return OriginAudit(lgas, lga, state);
-        },
-
-        message: 'LGA Cannot Be Found In the Specified State',
+      required: [true, 'Every User Must Have A State Of Residence.'],
+      enum: {
+        values: states,
+        message: 'Invalid State, Select A State In Nigeria.',
       },
+      lowercase: true
     },
+
     gender: {
       type: String,
       lowercase: true,
       enum: {
         values: ['male', 'female'],
-
-        message: 'Gender Can Only Be Either Male Or Female',
+        message: 'Gender Can Only Be Either Male Or Female.',
       },
-
-      required: [true, 'Every Participant Must Have A Gender'],
-
+      required: [true, 'Every User Must Have A Gender.'],
       trim: true,
+    },
+
+    phone: {
+      type: String,
+      lowercase: true,
+      required: [true, 'Every User Must Have A Valid Phone Number!']
     },
 
     active: {
       type: Boolean,
-
-      dafault: true,
-    },
-
-    alive: {
-      type: Boolean,
-
       dafault: true,
     },
 
@@ -159,15 +114,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       lowercase: true,
-      unique: [true, 'Unique SACRAMENT ID Belongs To An Existing User'],
+      unique: [true, 'User already exists!'],
     },
 
-    createdBy: {
-      type: mongoose.Schema.ObjectId,
-      // ref: Staff,
-      // required: [true, 'Every Document Must Have A Creator'],
+    verified: {
+      type: Boolean,
+      default: false
     },
-
     createdAt: {
       type: Date,
 
@@ -176,9 +129,9 @@ const userSchema = new mongoose.Schema(
   },
 
   {
-    toJSON: { virtuals: true, versionKey: false, id: true },
+    toJSON: { virtuals: true, versionKey: false },
 
-    toObject: { virtuals: true, versionKey: false, id: true },
+    toObject: { virtuals: true, versionKey: false },
   }
 );
 
@@ -192,16 +145,51 @@ userSchema.index({ slug: 1 });
 
 // initiating the pre and post hooks
 
-userSchema.pre('save', function (next) {
-  const uniqueId = new ShortUniqueId();
+userSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const uniqueId = new ShortUniqueId();
 
-  const slug = `${this.christainName}-${this.lastName}-${uniqueId()}`;
+    this.userNo = parseInt(await Model('User').find().estimatedDocumentCount()) + 1;
+  
+    const slug = `${this.firstName}-${this.lastName}-${this.userNo}-${uniqueId()}`;
+  
+    this.slug = slugify(slug, { lower: true });
 
-  this.slug = slugify(slug, { lower: true });
+    this.password = await bcrypt.hash(this.password, 12);
+  
+    this.passwordConfirm = undefined;
+  }
+
+
+  next();
+});
+userSchema.pre('save', async function (next) {
+
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  this.passwordConfirm = undefined;
 
   next();
 });
 
-const User = mongoose.model('User', userSchema);
+// USER STATICS
+userSchema.statics.findByEmail = async function(email) {
+  return await this.findOne({ email });
+}
+
+userSchema.statics.findBySlug = async function(slug) {
+  return await this.findOne({ slug });
+}
+
+// USER METHODS
+userSchema.methods.validPassword = async function(password) {
+  console.log(password)
+  return await bcrypt.compare(password, this.password);
+}
+
+const User = Model('User', userSchema);
+
 
 module.exports = User;

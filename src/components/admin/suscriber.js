@@ -1,11 +1,14 @@
 /**
  *
- * @description subScribes for backup Feature
+ * @description subScribes for admin Feature
  */
 
-const backupEvents = (eventEmitter) => {
+const adminEvents = (eventEmitter) => {
+  eventEmitter.on('New Admin', (admin) => {
+    _logger.info(`✅✅✅ ➡ New Admin has been created!\nAdmin = ${admin}`);
+  });
 
   return eventEmitter;
 };
 
-module.exports = backupEvents;
+module.exports = adminEvents;
