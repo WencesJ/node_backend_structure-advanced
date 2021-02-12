@@ -21,41 +21,46 @@ exports.reqValidate = (endpoint) => {
             return next(new AppError('Something went wrong!', 500));
         }
 
+        const data = {
+            params: req.params,
+            body: req.body
+        }
+
         const request_methods = {
-            GET: req.params,
-            POST: req.body,
-            PATCH: req.body,
-            DELETE: req.body
+            GET: { ...data },
+            POST: { ...data },
+            PATCH: { ...data },
+            DELETE: { ...data }
         }
         
         const requestData = request_methods[req.method];
 
-        request = selectProps(requestData, Object.keys(validate[endpoint]));
+        const schema = Joi.object({ ...validate[endpoint].params, ...validate[endpoint].body });
 
-        const schema = Joi.object({
-            ...validate[endpoint]
-        });
+        const { error } = schema.validate({ ...requestData.params, ...requestData.body });
 
-        const { value, error } = schema.validate({ ...request });
-        
         if (error) {
             let msg = error.message;
+            
+            let errorKey = error.details[0].context.key;
+            let errorLabel = error.details[0].context.label;
+          
+           if (req.params[errorKey]) {
+                msg = msg.replace(`"${errorLabel}"`, `'${req.params[errorKey]}'`);
+                msg += " in url parameters."
+           }
+           else {
+                msg = msg.replace(`"${errorLabel}"`, `'${errorLabel}' : '${req.body[errorKey]}'`);
+                msg += " in JSON body."
 
-            if (msg.includes('ref')) {
-                msg = "'Password' and 'Confirm Password' Do Not Match. Please Check Passwords!"
-            }
+           }
 
-            msg = msg.replace(/"/g, "'");
-
+            // msg = msg.replace(/"/g, "'");
             return next(new AppError(msg, 400));
         }
         
-        if (req.method === 'GET') {
-            req.params = selectProps(value, Object.keys(req.params));
-        }
-        else {
-            req.body = selectProps(value, Object.keys(req.body));
-        }
+        req.params = { ...requestData.params };
+        req.body = { ...requestData.params };
 
         next();
     }

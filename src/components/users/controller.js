@@ -152,7 +152,7 @@ class UserController extends Authentication {
     /**
      * @type {Object} - An Object of fields to be queried.
      */
-    const queryParams = (req.url.includes('me')) ? { ...req.user } : { ...req.params };
+    const queryParams = (req.user) ? { ...req.params, user_id: req.user._id } : { ...req.params };
 
     const queryFields = { ...req.body };
 
@@ -162,16 +162,16 @@ class UserController extends Authentication {
      * @describtion Use Either a mongodbUniqueId Or Slug to Search
      */
 
-    const { error, value: { data: user = {}} = {} } = await this.UserService.update(queryParams, queryFields);
+    // const { error, value: { data: user = {}} = {} } = await this.UserService.update(queryParams, queryFields);
     
-    if (error) {
-      return next(new AppError(error.msg, error.code));
-    }
+    // if (error) {
+    //   return next(new AppError(error.msg, error.code));
+    // }
 
     // Returns a json response
     res.status(STATUS.ACCEPTED).json({
       message: MSG.SUCCESS,
-      user,
+      // user,
     });
   });
 

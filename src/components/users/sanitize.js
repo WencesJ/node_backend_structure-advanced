@@ -13,80 +13,140 @@ const defaultStringValidate = Joi.string().lowercase().trim();
 
 module.exports = {
   createUser: {
-    firstName: defaultStringValidate.required().min(3).max(30).label('First Name'),
+    params: {
+      
+    },
 
-    middleName: defaultStringValidate.min(3).max(30).label('Middle Name'),
+    body: {
+      firstName: defaultStringValidate.required().min(3).max(30).label('First Name'),
 
-    lastName: defaultStringValidate.required().min(3).max(30).label('Last Name'),
+      middleName: defaultStringValidate.min(3).max(30).label('Middle Name'),
 
-    email: defaultStringValidate.email().required(),
+      lastName: defaultStringValidate.required().min(3).max(30).label('Last Name'),
 
-    password: defaultStringValidate.required().min(6).max(30),
+      email: defaultStringValidate.email().required(),
 
-    passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password'),
+      password: defaultStringValidate.required().min(6).max(30),
 
-    dob: Joi.date().min(`1-1-${new Date().getFullYear() - 70}`).max(`12-31-${new Date().getFullYear() - 4}`).required().error(new AppError(`Year Of Birth Must Be From ${new Date().getFullYear() - 70} to ${new Date().getFullYear() - 4}`)),
+      passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password'),
+
+      dob: Joi.date().min(`1-1-${new Date().getFullYear() - 70}`).max(`12-31-${new Date().getFullYear() - 4}`).required().error(new AppError(`Year Of Birth Must Be From ${new Date().getFullYear() - 70} to ${new Date().getFullYear() - 4}`)),
+      
+      stateOfOrigin: defaultStringValidate.valid(...states).label('State Of Origin').required(),
+
+      stateOfResidence: defaultStringValidate.valid(...states).label('State Of Residence').required(),
+
+      gender: defaultStringValidate.valid(...['male', 'female']).required(),
+
+      phone: defaultStringValidate.required(),
+
+      socials: {
+        facebook: defaultStringValidate,
+        instagram: defaultStringValidate
+      }
     
-    stateOfOrigin: defaultStringValidate.valid(...states).label('State Of Origin').required(),
-
-    stateOfResidence: defaultStringValidate.valid(...states).label('State Of Residence').required(),
-
-    gender: defaultStringValidate.valid(...['male', 'female']).required(),
-
-    phone: defaultStringValidate.required(),
-
-    socials: {
-      facebook: defaultStringValidate,
-      instagram: defaultStringValidate
     }
-    
   },
 
   verifyUser: {
-    email: defaultStringValidate.email().required()
-  },
+    params: {
 
-  getUser: {
-    slug: defaultStringValidate.required(),
-  },
+    },
 
-  deleteUser: {
-    slug: defaultStringValidate.required(),
-  },
-  updateUser: {
-    phone: defaultStringValidate,
-    stateOfResidence: defaultStringValidate.valid(...states).label('State Of Residence').required(),
-    socials: {
-      facebook: defaultStringValidate,
-      instagram: defaultStringValidate
+    body: {
+      email: defaultStringValidate.email().required()
     }
   },
 
-  loginUser: {
-    email: defaultStringValidate.email().required(),
+  getUser: {
+    params: {
+      slug: defaultStringValidate.required(),
+    },
 
-    password: defaultStringValidate.required().min(6).max(30),
+    body: {
+    }
+  },
+
+  deleteUser: {
+    params: {
+      slug: defaultStringValidate.required(),
+    },
+
+    body: {
+      
+    }
+  },
+  updateUser: {
+    params: {
+
+    },
+
+    body: {
+      phone: defaultStringValidate,
+      stateOfResidence: defaultStringValidate.valid(...states).label('State Of Residence').required(),
+      socials: {
+        facebook: defaultStringValidate,
+        instagram: defaultStringValidate
+      }
+    }
+    
+  },
+
+  loginUser: {
+    params: {
+
+    },
+    
+    body: {
+      email: defaultStringValidate.email().required(),
+
+      password: defaultStringValidate.required().min(6).max(30),
+    }
   },
 
   sendResetPasswordTokenUser: {
-    email: defaultStringValidate.email().required(),
+    params: {
+
+    },
+
+    body: {
+      email: defaultStringValidate.email().required(),
+    }
   },
 
   verifyResetPasswordTokenUser: {
-    token: Joi.number().required(),
+    params: {
+
+    },
+
+    body: {
+      token: Joi.number().required(),
+    }
   },
 
   resetPasswordUser: {
-    password: defaultStringValidate.required().min(6).max(30),
+    params: {
 
-    passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password')
+    },
+
+    body: {
+      password: defaultStringValidate.required().min(6).max(30),
+  
+      passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password')
+    }
   },
   changePasswordUser: {
-    currentPassword: defaultStringValidate.required().min(6).max(30),
+    params: {
 
-    password: defaultStringValidate.required().min(6).max(30),
+    },
 
-    passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password')
+    body: {
+      currentPassword: defaultStringValidate.required().min(6).max(30),
+  
+      password: defaultStringValidate.required().min(6).max(30),
+  
+      passwordConfirm: defaultStringValidate.required().valid(Joi.ref('password')).label('Confirm Password')
+    }
   }
 
   // getAllUsers: {

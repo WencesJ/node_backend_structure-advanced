@@ -8,7 +8,7 @@ const { STATUS, MSG } = _include('libraries/shared/constants');
 
 // end requiring the modules
 
-class AdminService extends ApiFeatures{
+class AdminService extends ApiFeatures {
   /**
    * Creates admin controller
    * @param {Object} [adminModel = AdminModel] - Instance of a Mongoose Schema of Announcement Model

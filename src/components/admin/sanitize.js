@@ -9,28 +9,28 @@ const defaultStringValidate = Joi.string().lowercase().trim();
 
 module.exports = {
   createAdmin: {
-    name: defaultStringValidate.required().min(3).max(30),
+    params: {
 
-    email: defaultStringValidate.email().required(),
+    },
 
-    password: defaultStringValidate.required().min(6).max(30)
-    
+    body: {      
+      name: defaultStringValidate.required().min(3).max(30),
+  
+      email: defaultStringValidate.email().required(),
+  
+      password: defaultStringValidate.required().min(6).max(30)
+      
+    }
   },
   loginAdmin: {
-    email: defaultStringValidate.email().required(),
+    params: {
 
-    password: defaultStringValidate.required().min(6).max(30),
+    },
+
+    body: {
+      email: defaultStringValidate.email().required(),
+  
+      password: defaultStringValidate.required().min(6).max(30),
+    }
   },
-
-  updateCurrentStage: {
-    stage: Joi.string().trim().valid('firstStage', 'secondStage', 'thirdStage').required(),
-
-    votes: Joi.number().min(1)
-  },
-
-  stageWinners: {
-    stage: Joi.string().trim().valid('firstStage', 'secondStage', 'thirdStage').required(),
-
-    limit: Joi.number().min(1)
-  }
 };

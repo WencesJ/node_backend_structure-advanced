@@ -30,7 +30,7 @@ router.post('/reset_password', reqValidate('resetPasswordUser'), userCntrl.reset
 router.post('/logout', userCntrl.logOut);
 
 // NEEDS AUTHORIZATION
-router.use(userCntrl.activeSession);
+// router.use(userCntrl.activeSession);
 
 router.route('/me')
   .get(userCntrl.getUser)

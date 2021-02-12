@@ -58,6 +58,7 @@ exports.sessionParams = (expressSession) => {
       secure: false,
       // secure: (env.NODE_ENV === env.PROD) ? true : false,
       maxAge: parseInt(session.COOKIE_MAX_AGE), // Time in milliseconds
+      sameSite: 'none'
     },
     saveUninitialized: false,
     

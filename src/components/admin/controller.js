@@ -1,13 +1,10 @@
-// NODE MODULES
-const passport = require('passport');
-
 
 // USER MODULES
 const AdminService = require('./service');
 
 const { Service: UserService } = _include('components/users');
 
-const { authHelpers : { signToken }, Authentication } = _include("components/auth");
+const { Authentication } = _include("components/auth");
 
 const { AppError, catchAsync } = _include('libraries/error');
 
