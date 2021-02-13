@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 const mongoConnect = require('connect-mongo');
 
-
-
-
 const rateLimit = require('express-rate-limit');
-const { config: { session, env } } = _include('libraries/config');
+const { config: { session, env:ENV } } = _include('libraries/config');
 
 exports.rateLimiter = max =>
     rateLimit({
@@ -34,36 +31,47 @@ exports.fieldplugout = (obj, props) => {
   return obj;
 };
 
+exports.corsOptions = {
+  origin: true,
+
+  credentials: true,
+
+  allowHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'X-Access-Token',
+      'Authorization'
+  ],
+
+  exposedHeaders: ['Content-Range', 'X-Content-Range', 'Set-Cookie']
+}
+
 exports.sessionParams = (expressSession) => {
-
   const MongoStore = mongoConnect(expressSession);
-  const mongoStoreInstance = new MongoStore({ 
-    mongooseConnection: mongoose.connection, 
-    secret: session.STORE_SECRET,
-    ttl: parseInt(session.STORE_TTL)
-  })
+  const mongoStoreInstance = new MongoStore({
+      mongooseConnection: mongoose.connection,
+      secret: session.STORE_SECRET,
+      ttl: parseInt(session.STORE_TTL),
+  });
 
-  // mongoStoreInstance.on('destroy', (sessionId) => {
-  //   console.log('destroying session', sessionId);
-  // });
-  // mongoStoreInstance.on('touch', (sessionId) => {
-  //   console.log('touching session', sessionId);
-  // });
-  
+  const environment = ENV.NODE_ENV === ENV.PROD;
+
   return {
-    secret: session.SECRET,
-    name: session.NAME,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      // secure: (env.NODE_ENV === env.PROD) ? true : false,
-      maxAge: parseInt(session.COOKIE_MAX_AGE), // Time in milliseconds
-      sameSite: 'none'
-    },
-    saveUninitialized: false,
-    
-    resave: false,
-    store: mongoStoreInstance,
-    unset: 'destroy'
-  }
+      secret: session.SECRET,
+      name: session.NAME,
+      cookie: {
+          httpOnly: environment,
+          secure: environment,
+          sameSite: environment ? 'none' : 'lax',
+          maxAge: parseInt(session.COOKIE_MAX_AGE), // Time in milliseconds
+          sameSite: 'none',
+      },
+      saveUninitialized: false,
+
+      resave: false,
+      store: mongoStoreInstance,
+      unset: 'destroy',
+  };
 };

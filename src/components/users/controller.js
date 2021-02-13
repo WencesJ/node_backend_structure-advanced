@@ -167,7 +167,7 @@ class UserController extends Authentication {
     // if (error) {
     //   return next(new AppError(error.msg, error.code));
     // }
-
+    
     // Returns a json response
     res.status(STATUS.ACCEPTED).json({
       message: MSG.SUCCESS,

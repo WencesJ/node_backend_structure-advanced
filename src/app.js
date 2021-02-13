@@ -17,7 +17,7 @@ const { Router: userRouter, User } = _include('components/users');
 
 const { Router: adminRouter } = _include('components/admin');
 
-const { rateLimiter, sessionParams } = _include('libraries/shared/helpers');
+const { rateLimiter, sessionParams, corsOptions } = _include('libraries/shared/helpers');
 
 // const { passportAuth } = _include('libraries/config');
 
@@ -80,7 +80,7 @@ app.use(xss());
 // COMPRESSING TEXT RESPONSES
 // app.use(compression()); // USED DURING PRODUCTION PHASE
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 // IMPLEMENTING RATE LIMITING
 // TODO: Make Function Flexible by implementing parameter injection for rate limit expiration time
