@@ -60,7 +60,7 @@ exports.reqValidate = (endpoint) => {
         }
         
         req.params = { ...requestData.params };
-        req.body = { ...requestData.params };
+        req.body = { ...requestData.body };
 
         next();
     }
