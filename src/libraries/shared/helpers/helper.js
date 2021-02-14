@@ -62,11 +62,10 @@ exports.sessionParams = (expressSession) => {
       secret: session.SECRET,
       name: session.NAME,
       cookie: {
-          httpOnly: environment,
+          httpOnly: true,
           secure: environment,
           sameSite: environment ? 'none' : 'lax',
           maxAge: parseInt(session.COOKIE_MAX_AGE), // Time in milliseconds
-          sameSite: 'none',
       },
       saveUninitialized: false,
 
